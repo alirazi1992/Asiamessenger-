@@ -1,0 +1,84 @@
+datasource db { provider = "sqlite"; url = "file:./dev.db" }
+generator client { provider = "prisma-client-js" }
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String
+  image         String?
+  passwordHash  String
+  status        String   @default("online")
+  memberships   Membership[]
+  messages      Message[] @relation("author")
+}
+
+model Workspace {
+  id          String        @id @default(cuid())
+  name        String
+  slug        String        @unique
+  memberships Membership[]
+  channels    Channel[]
+}
+
+model Membership {
+  id          String     @id @default(cuid())
+  role        String
+  userId      String
+  workspaceId String
+  user        User       @relation(fields: [userId], references: [id])
+  workspace   Workspace  @relation(fields: [workspaceId], references: [id])
+}
+
+model Channel {
+  id           String     @id @default(cuid())
+  name         String
+  isPrivate    Boolean    @default(false)
+  workspaceId  String
+  workspace    Workspace  @relation(fields: [workspaceId], references: [id])
+  members      ChannelMember[]
+  messages     Message[]
+}
+
+model ChannelMember {
+  id        String  @id @default(cuid())
+  userId    String
+  channelId String
+  user      User    @relation(fields: [userId], references: [id])
+  channel   Channel @relation(fields: [channelId], references: [id])
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  channelId   String?
+  dmPeerId    String?
+  workspaceId String
+  authorId    String
+  content     String
+  html        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  author      User     @relation("author", fields: [authorId], references: [id])
+  reactions   Reaction[]
+  files       File[]
+}
+
+model Reaction {
+  id        String  @id @default(cuid())
+  emoji     String
+  messageId String
+  userId    String
+  message   Message @relation(fields: [messageId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+  @@unique([messageId, userId, emoji])
+}
+
+model File {
+  id        String   @id @default(cuid())
+  name      String
+  mime      String
+  size      Int
+  url       String
+  messageId String?
+  message   Message? @relation(fields: [messageId], references: [id])
+  uploadedAt DateTime @default(now())
+}
