@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* optional globals */
+
+:root {
+  --bg: #0b0c0f; /* page gradient base */
+  --panel: #0f1115; /* panels */
+  --panel-2: #12141a; /* hover panel */
+  --border: #1f2330;
+  --text: #e7ebf3;
+  --text-dim: #9aa4b2;
+  --accent: #4f8cff; /* brand */
+  --success: #30d158;
+}
+
+html,
+body,
+#root {
+  background: linear-gradient(180deg, #121826, #10131b) fixed;
+}
+* {
+  border-color: var(--border);
+}
